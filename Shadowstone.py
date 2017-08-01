@@ -79,7 +79,7 @@ def main():
     level = 1
     opponent_weapon = ''
     player_weapon = ''
-    event = ''
+
 
     dice_images = [dice_1_image, dice_15_image, dice_15_image, dice_15_image, dice_15_image, dice_15_image,
                    dice_15_image, dice_15_image, dice_15_image, dice_15_image, dice_15_image, dice_15_image,
@@ -117,7 +117,7 @@ def main():
             elif key_pressed[pygame.K_4]:
                 player_character = characters.get('Player D')
 
-        check_for_quit(event)
+            check_for_quit(event)
 
     # 3 Conquests as long as player has health
 
@@ -135,8 +135,9 @@ def main():
         display_description(level, opponent.get('name'))
         pygame.display.update()
 
-        return_pressed = False
 
+
+        """return_pressed = False
         while return_pressed is False:
 
             for event in pygame.event.get():
@@ -145,29 +146,37 @@ def main():
                 if key_pressed[pygame.K_RETURN]:
                     return_pressed = True
 
-            check_for_quit(event)
+            check_for_quit(event)"""
+
+        wait_for_return()
 
 
         # Work out who Starts
 
-        return_pressed = False
+        #return_pressed = False
 
         game_screen.blit(background_image, [0, 0])
         display_board(opponent, player_character, opponent_items, player_items, items)
-        board_message_box('Hit RETURN to see who starts')
+        #board_message_box('Hit RETURN to see who starts')
+
+        player_name = player_character.get('name')
+        opponent_name = opponent.get('name')
+        board_message_box(player_name + ' and ' + opponent_name + ' come face to face.')
         pygame.display.update()
 
-        while return_pressed is False:
+        """while return_pressed is False:
             for event in pygame.event.get():
                 key_pressed = pygame.key.get_pressed()
                 if key_pressed[pygame.K_RETURN]:
                     return_pressed = True
 
-            check_for_quit(event)
+            check_for_quit(event)"""
+
+        wait_for_return()
 
         board_message_box('')
         pygame.display.update()
-        pygame.time.wait(PAUSE_TIME)
+        #pygame.time.wait(PAUSE_TIME)
 
 
         # Play Turn
@@ -178,7 +187,7 @@ def main():
         while opponent_health > 0 and player_health > 0:  # Keep playing while both still have health
 
             # Display the turn arrow
-            if turn == 'Opponent':
+            """if turn == 'Opponent':
                 display_arrow = down_arrow_image
             else:
                 display_arrow = up_arrow_image
@@ -197,7 +206,18 @@ def main():
 
 
             pygame.display.update()
-            pygame.time.wait(PAUSE_TIME)
+            pygame.time.wait(PAUSE_TIME)"""
+
+            if turn == 'Opponent':
+                board_message_box(opponent_name + ' strikes...')
+                game_screen.blit(turn_image, [TURN_X, OPPONENT_TURN_Y])
+            else:
+                board_message_box(player_name + ' attacks...')
+                game_screen.blit(turn_image, [TURN_X, PLAYER_TURN_Y])
+
+            pygame.display.update()
+
+            wait_for_return()
 
 
 
@@ -245,7 +265,7 @@ def main():
                                 board_message_box('No weapon in that slot. Choose a weapon to attack (1-5)')
                                 pygame.display.update()
 
-                    check_for_quit(event)
+                        check_for_quit(event)
 
                 player_weapon_chosen = player_items[weapon_no - 1]
                 player_weapon = items.get(player_weapon_chosen)
@@ -260,12 +280,12 @@ def main():
                                   ' or above.')
 
             pygame.display.update()
-            pygame.time.wait(PAUSE_TIME)
+            wait_for_return()
 
 
             # Roll Attack Chance
             board_message_box('')
-            chance_roll = 0
+            """chance_roll = 0
 
             # Keep dice rolling a few times
             spins = random.randint(5, 8)
@@ -277,13 +297,18 @@ def main():
                 pygame.display.update()
                 pygame.time.wait(DICE_ROLL_TIME)
 
-            pygame.time.wait(PAUSE_TIME)
+            pygame.time.wait(PAUSE_TIME)"""
+
+            chance_roll = random.randint(1, 20)
+            game_screen.blit(dice_images[chance_roll - 1], [DICE_X, DICE_Y])
+            pygame.display.update()
+            wait_for_return()
 
             # Attack is successful
             if chance_roll >= attack_dice:
-                board_message_box('Attack succeeded, now rolling for health damage...')
+                board_message_box('Attack succeeded, rolling for health damage...')
                 pygame.display.update()
-                pygame.time.wait(PAUSE_TIME)
+                wait_for_return()
 
                 if turn == 'Opponent':
                     max_damage = opponent_weapon.get('attack')
@@ -293,7 +318,7 @@ def main():
                 board_message_box('')
 
                 # Roll the dice for damage hits
-                spins = random.randint(5, 8)
+                """spins = random.randint(5, 8)
                 damage_roll = 0
 
                 for spin in range(spins):
@@ -304,7 +329,13 @@ def main():
                     pygame.display.update()
                     pygame.time.wait(DICE_ROLL_TIME)
 
-                pygame.time.wait(PAUSE_TIME)
+                pygame.time.wait(PAUSE_TIME)"""
+
+                damage_roll = random.randint(1, max_damage)
+                game_screen.blit(dice_images[damage_roll - 1], [DICE_X, DICE_Y])
+                pygame.display.update()
+                wait_for_return()
+
 
                 # Reduce health points
                 if turn == 'Opponent':
@@ -315,17 +346,19 @@ def main():
                 else:
                     opponent_health -= damage_roll
                     opponent['health'] = opponent_health
-                    board_message_box(opponent.get('name') + ' takes a damage of ' + str(damage_roll) + ' to health.')
+                    board_message_box(opponent_name + ' takes a damage of ' + str(damage_roll) + ' to health.')
 
                 pygame.display.update()
-                pygame.time.wait(PAUSE_TIME)
+                wait_for_return()
+                #pygame.time.wait(PAUSE_TIME)
 
                 # If both players still alive, random test for weapon or armour damage
                 if opponent_health > 0 and player_health > 0:
 
-                    board_message_box('Finally, rolling for any weapon or armour damage...')
+                    board_message_box('Checking for any weapon or armour damage...')
                     pygame.display.update()
-                    pygame.time.wait(PAUSE_TIME)
+                    #pygame.time.wait(PAUSE_TIME)
+                    wait_for_return()
 
                     if turn == 'Opponent':
                         damage_item = random.choice(player_items)
@@ -338,13 +371,14 @@ def main():
                         # If empty slot or hands slot selected, no damage
                         board_message_box('No weapon or armour damage inflicted.')
                         pygame.display.update()
-                        pygame.time.wait(PAUSE_TIME)
+                        #pygame.time.wait(PAUSE_TIME)
+                        wait_for_return()
 
                     else:
 
                         # Item is damaged so remove it
                         damage_item_name = items.get(damage_item).get('name')
-                        board_message_box(damage_item_name + ' is destroyed.')
+                        board_message_box(damage_item_name + ' is destroyed!')
 
                         if turn == 'Opponent':
                             position = player_items.index(damage_item)
@@ -354,7 +388,8 @@ def main():
                             opponent_items[position] = 'Empty'
 
                         pygame.display.update()
-                        pygame.time.wait(PAUSE_TIME)
+                        #pygame.time.wait(PAUSE_TIME)
+                        wait_for_return()
 
             else:
 
@@ -362,12 +397,13 @@ def main():
                 board_message_box('Attack failed!')
 
                 pygame.display.update()
-                pygame.time.wait(PAUSE_TIME)
+                #pygame.time.wait(PAUSE_TIME)
+                wait_for_return()
 
 
             # Is player or opponent health 0 or less?
             if player_health <= 0:
-                board_message_box('You have been defeated by ' + opponent.get('name') + '!')
+                board_message_box('You have been defeated by ' + opponent.get('name') + '!!!')
             elif opponent_health <=0:
 
                 # Boost player health with random value
@@ -377,7 +413,8 @@ def main():
                 player_character['health'] = player_health + health_boost
 
                 pygame.display.update()
-                pygame.time.wait(PAUSE_TIME)
+                #pygame.time.wait(PAUSE_TIME)
+                wait_for_return()
 
                 # Give player any gold the opponent had
                 gold = opponent.get('gold')
@@ -400,7 +437,8 @@ def main():
                             break
 
                 pygame.display.update()
-                pygame.time.wait(PAUSE_TIME)
+                #pygame.time.wait(PAUSE_TIME)
+                wait_for_return()
 
                 level += 1
 
@@ -433,7 +471,7 @@ def main():
 
     pygame.display.update()
 
-    return_pressed = False
+    """return_pressed = False
 
     while return_pressed is False:
 
@@ -443,7 +481,9 @@ def main():
             if key_pressed[pygame.K_RETURN]:
                 return_pressed = True
 
-        check_for_quit(event)
+        check_for_quit(event)"""
+
+    wait_for_return()
 
 
 
@@ -453,6 +493,19 @@ def check_for_quit(event):
     if event.type == QUIT:
         pygame.quit()
         sys.exit()
+
+def wait_for_return():
+
+    return_pressed = False
+    while return_pressed is False:
+
+        for event in pygame.event.get():
+            key_pressed = pygame.key.get_pressed()
+
+            if key_pressed[pygame.K_RETURN]:
+                return_pressed = True
+
+            check_for_quit(event)
 
 
 # Display the player characters to be chosen from
